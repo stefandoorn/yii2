@@ -71,14 +71,14 @@ class Controller extends \yii\base\Controller
         $actionParams = [];
         foreach ($method->getParameters() as $param) {
             $name = $param->getName();
-            if (($class = $param->getClass()) !== null) {
+            if (array_key_exists($name, $params)) {
                 $className = $class->getName();
                 if (Yii::$app->has($name) && ($obj = Yii::$app->get($name)) instanceof $className) {
                     $args[] = $actionParams[$name] = $obj;
                 } else {
                     $args[] = $actionParams[$name] = Yii::$container->get($className);
                 }
-            } elseif (array_key_exists($name, $params)) {
+            } elseif (($class = $param->getClass()) !== null) {
                 if ($param->isArray()) {
                     $args[] = $actionParams[$name] = (array) $params[$name];
                 } elseif (!is_array($params[$name])) {
