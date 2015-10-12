@@ -72,13 +72,6 @@ class Controller extends \yii\base\Controller
         foreach ($method->getParameters() as $param) {
             $name = $param->getName();
             if (array_key_exists($name, $params)) {
-                $className = $class->getName();
-                if (Yii::$app->has($name) && ($obj = Yii::$app->get($name)) instanceof $className) {
-                    $args[] = $actionParams[$name] = $obj;
-                } else {
-                    $args[] = $actionParams[$name] = Yii::$container->get($className);
-                }
-            } elseif (($class = $param->getClass()) !== null) {
                 if ($param->isArray()) {
                     $args[] = $actionParams[$name] = (array) $params[$name];
                 } elseif (!is_array($params[$name])) {
@@ -89,6 +82,13 @@ class Controller extends \yii\base\Controller
                     ]));
                 }
                 unset($params[$name]);
+            } elseif (($class = $param->getClass()) !== null) {
+                $className = $class->getName();
+                if (Yii::$app->has($name) && ($obj = Yii::$app->get($name)) instanceof $className) {
+                    $args[] = $actionParams[$name] = $obj;
+                } else {
+                    $args[] = $actionParams[$name] = Yii::$container->get($className);
+                }
             } elseif ($param->isDefaultValueAvailable()) {
                 $args[] = $actionParams[$name] = $param->getDefaultValue();
             } else {
@@ -118,7 +118,7 @@ class Controller extends \yii\base\Controller
             }
             return true;
         }
-        
+
         return false;
     }
 
